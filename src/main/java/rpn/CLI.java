@@ -1,17 +1,20 @@
 package rpn;
 
+import jdk.jfr.events.ExceptionThrownEvent;
+
 import java.util.Stack;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class CLI
 {
+
     public static final void main(String[] args)
     {
         String expression = Stream.of(args).collect(Collectors.joining(" "));
         System.out.println("About to evaluate '" + expression + "'");
 
-        double result = 0;
+        double result;
         try
         {
             result = evaluate(expression);
@@ -33,10 +36,10 @@ public class CLI
         {
             if (isOperator(operation))
             {
-                final Double value1 = stack.pop();
-                final Double value2 = stack.pop();
+                final Double second = stack.pop();
+                final Double first = stack.pop();
 
-                final Double result = operate(value1, value2, operation);
+                final Double result = operate(first, second, operation);
                 stack.push(result);
             }
             else
