@@ -1,7 +1,5 @@
 package rpn;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Stack;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -29,20 +27,16 @@ public class CLI
     static double evaluate(String expression) throws ArithmeticException
     {
         final Stack<Double> stack = new Stack<>();
-        final List<Double> numbers = new ArrayList<>();
-
         final String[] calculatedValues = expression.split(" ");
 
         for (String operation : calculatedValues)
         {
             if (isOperator(operation))
             {
-                while (!stack.isEmpty())
-                {
-                    numbers.add(stack.pop());
-                }
+                final Double value1 = stack.pop();
+                final Double value2 = stack.pop();
 
-                final Double result = operate(numbers, operation);
+                final Double result = operate(value1, value2, operation);
                 stack.push(result);
             }
             else
@@ -54,32 +48,25 @@ public class CLI
         return stack.pop();
     }
 
-    private static Double operate(List<Double> numbers, String operator) throws ArithmeticException
+    private static Double operate(Double value1, Double value2, String operator) throws ArithmeticException
     {
-        return numbers.stream().reduce(0.0, (total, number) ->
+        switch (operator)
         {
-            switch (operator)
-            {
-                case "*":
-                    total *= number;
-                    break;
-                case "+":
-                    total += number;
-                    break;
-                case "-":
-                    total -= number;
-                    break;
-                default:
-                    if (number == 0)
-                    {
-                        throw new ArithmeticException("Impossible de diviser par 0");
-                    }
-                    total /= number;
-                    break;
-            }
+            case "*":
+                return value1 * value2;
+            case "+":
+                return value1 + value2;
 
-            return total;
-        });
+            case "-":
+                return value1 - value2;
+
+            default:
+                if (value2 == 0)
+                {
+                    throw new ArithmeticException("Impossible de diviser par 0");
+                }
+                return value1 / value2;
+        }
     }
 
     private static boolean isOperator(String operation)
