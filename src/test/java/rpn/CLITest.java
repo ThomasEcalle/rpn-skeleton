@@ -124,11 +124,13 @@ public class CLITest
         assertThat(evaluate("-4 2 /")).isEqualTo(-2);
     }
 
+
     @Test(expected = ArithmeticException.class)
     public void should_throw_exception_when_dividing_by_zero()
     {
         evaluate("3 0 /");
     }
+
 
     // Special cases
 
@@ -138,11 +140,11 @@ public class CLITest
         assertThat(evaluate("3 5 8 * 7 + *")).isEqualTo(141);
     }
 
-    /*
-    @Test
-    public void should_print_end_of_expression()
+
+    @Test(expected = IllegalArgumentException.class)
+    public void should_throw_illegal_argument_excetion()
     {
-        assertThat(evaluate("7 2 - 3 4")).isEqualTo("5 3 4");
+        evaluate("7 2 i + +");
     }
-    */
+
 }
