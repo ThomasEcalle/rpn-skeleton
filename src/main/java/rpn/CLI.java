@@ -87,10 +87,12 @@ public class CLI
         {
             if (Operator.isOperator(operation))
             {
+                final Operator operator = Operator.getFromString(operation);
+
                 final Double second = stack.pop();
                 final Double first = stack.pop();
 
-                final Double result = operate(first, second, operation);
+                final Double result = operate(first, second, operator);
                 stack.push(result);
             }
             else
@@ -101,7 +103,7 @@ public class CLI
                 }
                 catch (NumberFormatException exception)
                 {
-                    throw new IllegalArgumentException("'" + operation + "'" + " is not a valid number");
+                    throw new IllegalArgumentException("'" + operation + "'" + " is not a valid argument");
                 }
 
             }
@@ -110,16 +112,16 @@ public class CLI
         return stack.pop();
     }
 
-    private static Double operate(Double value1, Double value2, String operator) throws ArithmeticException
+    private static Double operate(Double value1, Double value2, Operator operator) throws ArithmeticException
     {
         switch (operator)
         {
-            case Operator.TIMES:
+            case TIMES:
                 return value1 * value2;
-            case "+":
+            case PLUS:
                 return value1 + value2;
 
-            case "-":
+            case MINUS:
                 return value1 - value2;
 
             default:
@@ -129,4 +131,5 @@ public class CLI
                 }
                 return value1 / value2;
         }
+    }
 }
