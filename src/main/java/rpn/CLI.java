@@ -1,7 +1,10 @@
 package rpn;
 
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Stack;
+import java.util.function.DoubleBinaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -38,6 +41,43 @@ public class CLI
         }
     }
 
+    public enum Operator
+    {
+
+        PLUS("+"),
+        MINUS("-"),
+        TIMES("*"),
+        DIVIDE("/"),
+        POWER("**");
+
+        private static Map<String, Operator> lookup = new HashMap<>();
+
+        static
+        {
+            for (Operator operator : Operator.values())
+            {
+                lookup.put(operator.operator, operator);
+            }
+        }
+
+        private final String operator;
+
+        Operator(String operator)
+        {
+            this.operator = operator;
+        }
+
+        public static Operator getFromString(String operator)
+        {
+            return lookup.get(operator);
+        }
+
+        public static boolean isOperator(String operator)
+        {
+            return getFromString(operator) != null;
+        }
+    }
+
     static double evaluate(String expression) throws ArithmeticException, IllegalArgumentException
     {
         final Stack<Double> stack = new Stack<>();
@@ -45,7 +85,7 @@ public class CLI
 
         for (String operation : calculatedValues)
         {
-            if (isOperator(operation))
+            if (Operator.isOperator(operation))
             {
                 final Double second = stack.pop();
                 final Double first = stack.pop();
@@ -74,7 +114,7 @@ public class CLI
     {
         switch (operator)
         {
-            case "*":
+            case Operator.TIMES:
                 return value1 * value2;
             case "+":
                 return value1 + value2;
@@ -89,10 +129,4 @@ public class CLI
                 }
                 return value1 / value2;
         }
-    }
-
-    private static boolean isOperator(String operation)
-    {
-        return operation.equals("*") || operation.equals("+") || operation.equals("-") || operation.equals("/");
-    }
 }
