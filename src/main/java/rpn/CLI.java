@@ -1,9 +1,9 @@
 package rpn;
 
 
-import rpn.calculator.Calculator;
-import rpn.calculator.CalculatorError.CalculationError;
-import rpn.calculator.CalculatorError.FormatError;
+import rpn.event.*;
+import rpn.orchestrator.Orchestrator;
+import rpn.tokenizer.Tokenizer;
 
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -13,27 +13,46 @@ public class CLI
     public static final void main(String[] args)
     {
         String expression = Stream.of(args).collect(Collectors.joining(" "));
-        System.out.println("About to evaluate '" + expression + "'");
-
-        try
-        {
-            System.out.println("> " + evaluate(expression));
-        }
-        catch (CalculationError error)
-        {
-            System.out.println(error.getErrorMessage());
-        }
-        catch (FormatError error)
-        {
-            System.out.println(error.getErrorMessage());
-        }
-
+        evaluate(expression);
     }
 
-    static double evaluate(String expression) throws CalculationError, FormatError
+    public static void evaluate(String expression)
     {
-        final Calculator calculator = new Calculator(expression);
+        new CLI().process(expression, null);
+    }
 
-        return calculator.evaluate();
+    /**
+     * This method is used fort Tests in order to inject a ResultDisplayer
+     *
+     * @param expression
+     * @param resultDisplayerImpl
+     */
+    public static void evaluate(String expression, OnEventListener<ResultDisplayEvent> resultDisplayerImpl)
+    {
+        new CLI().process(expression, resultDisplayerImpl);
+    }
+
+    public void process(String expression, OnEventListener<ResultDisplayEvent> resultDisplayer)
+    {
+
+        EventDispatcher dispatcher = new EventDispatcher();
+
+        Tokenizer tokenizer = new Tokenizer(dispatcher);
+        Orchestrator orchestrator = new Orchestrator(dispatcher);
+
+        if (resultDisplayer == null)
+        {
+            resultDisplayer = new ResultDisplayer();
+        }
+
+        dispatcher.registerChannel(InputEvent.class, tokenizer);
+
+        dispatcher.registerChannel(TokenEvent.class, orchestrator);
+        dispatcher.registerChannel(EndTokenEvent.class, orchestrator);
+
+        dispatcher.registerChannel(ResultDisplayEvent.class, resultDisplayer);
+        dispatcher.registerChannel(ErrorEvent.class, resultDisplayer);
+
+        dispatcher.dispatch(new InputEvent(expression));
     }
 }

@@ -1,4 +1,4 @@
-package rpn.calculator.formatter;
+package rpn.tokenizer;
 
 public enum Separator
 {
